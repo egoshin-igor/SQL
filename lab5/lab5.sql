@@ -46,6 +46,3 @@ UPDATE medicine_manufacture, medicine
 SET medicine_manufacture.price = medicine_manufacture.price * 0.8
 WHERE (medicine_manufacture.id_medicine = medicine.id_medicine and medicine.treatment_duration <= 7)
        AND medicine_manufacture.price > 3000;
-
-
--- 1
