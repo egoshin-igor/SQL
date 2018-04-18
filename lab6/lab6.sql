@@ -58,8 +58,7 @@ WHERE
 
 -- 7 Привести пример транзакции при создании брони.
 START TRANSACTION;
-SELECT @id_room := 3;
-
+SELECT @id_room := 4;
 INSERT INTO booking VALUES (NULL, @id_room, "2014-05-28");
 SELECT @new_booking_id := LAST_INSERT_ID();
 INSERT INTO room_in_booking VALUES (NULL, @new_booking_id, @id_room, "2014-05-28", "2014-05-30");
