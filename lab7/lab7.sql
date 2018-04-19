@@ -69,12 +69,25 @@ LEFT JOIN subject ON subject.id_subject = lesson.id_subject;
 
 -- 5)	Дать оценки студентов специальности ВМ по всем проводимым предметам с указанием группы, фамилии, предмета, даты.
 --      При отсутствии оценки заполнить значениями NULL поля оценки и даты.
+CREATE TEMPORARY TABLE specialty_students AS (
+	SELECT student.id_student as id_student, student.last_name as student_name, subject.name as subject,
+		   lesson.id_lesson as id_lesson, lesson.date as date, study_group.group_name as group_name FROM lesson
+		LEFT JOIN study_group ON study_group.id_group = lesson.id_group
+		LEFT JOIN subject ON subject.id_subject = lesson.id_subject
+        LEFT JOIN student ON study_group.id_group = student.id_group
+		WHERE
+			study_group.specialty_name = "ВМ"
+	);
 
-SELECT student.last_name, study_group.group_name, subject.name, lesson.date, evaluation.student_evaluation  FROM evaluation
-LEFT JOIN lesson ON lesson.id_lesson = evaluation.id_lesson
-RIGHT JOIN student ON student.id_student = evaluation.id_student
-LEFT JOIN study_group ON study_group.id_group = student.id_group
-LEFT JOIN subject ON subject.id_subject = lesson.id_subject
+SELECT specialty_students.student_name, specialty_students.group_name, specialty_students.subject,
+       specialty_students.date, evaluation.student_evaluation  FROM evaluation
+RIGHT JOIN specialty_students ON specialty_students.id_student = evaluation.id_student;
+
+-- 6)	Всем студентам специальности ИВТ(ВМ), получившим оценки меньшие 5 по предмету Математика до 12.05, повысить эти оценки на 1 балл.
+-- ПОменял ИВТ на ВМ и БД на Математика, тк много студентов в записи с этими данными есть
+UPADTE evaluation
+SET evaluation.student_evaluation = evaluation.student_evaluation + 1
+LEFT JOIN specialty_students ON specialty_students.id_student = evaluation.id_student
 WHERE
-	study_group.specialty_name = "ВМ";
--- 6)	Всем студентам специальности ИВТ, получившим оценки меньшие 5 по предмету БД до 12.05, повысить эти оценки на 1 балл.
+	specialty_students.subject = "Математика" AND specialty_students.student_evaluation < 5 AND specialty_students.date < "2018-05-12"
+	
