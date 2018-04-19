@@ -56,7 +56,8 @@ CREATE OR REPLACE VIEW popular_lessons
 		popular_subjects.id_subject = lesson.id_subject;
         
 CREATE OR REPLACE VIEW average_evaluations
-	AS SELECT (CEIL(AVG(evaluation.student_evaluation) * 10) / 10) as average_evaluation, evaluation.id_student as id_student, evaluation.id_lesson as id_lesson FROM popular_lessons
+	AS SELECT (CEIL(AVG(evaluation.student_evaluation) * 10) / 10) as average_evaluation,
+			  evaluation.id_student as id_student, evaluation.id_lesson as id_lesson FROM popular_lessons
 	LEFT JOIN evaluation ON popular_lessons.id_lesson = evaluation.id_lesson
 	LEFT JOIN student ON student.id_student = evaluation.id_student
 	GROUP BY
@@ -83,11 +84,12 @@ SELECT specialty_students.student_name, specialty_students.group_name, specialty
        specialty_students.date, evaluation.student_evaluation  FROM evaluation
 RIGHT JOIN specialty_students ON specialty_students.id_student = evaluation.id_student;
 
--- 6)	Всем студентам специальности ИВТ(ВМ), получившим оценки меньшие 5 по предмету Математика до 12.05, повысить эти оценки на 1 балл.
+-- 6)	Всем студентам специальности ВМ, получившим оценки меньшие 5 по предмету Математика до 12.05, повысить эти оценки на 1 балл.
 -- ПОменял ИВТ на ВМ и БД на Математика, тк много студентов в записи с этими данными есть
-UPADTE evaluation
-SET evaluation.student_evaluation = evaluation.student_evaluation + 1
+
+UPDATE evaluation
 LEFT JOIN specialty_students ON specialty_students.id_student = evaluation.id_student
+SET evaluation.student_evaluation = evaluation.student_evaluation + 1
 WHERE
-	specialty_students.subject = "Математика" AND specialty_students.student_evaluation < 5 AND specialty_students.date < "2018-05-12"
+	specialty_students.subject = "Математика" AND evaluation.student_evaluation < 5 AND specialty_students.date < "2018-05-12";
 	
